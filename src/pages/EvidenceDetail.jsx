@@ -110,7 +110,7 @@ const EvidenceDetail = () => {
                 .reverse()
                 .map((v) => (
                   <tr key={v.version}>
-                    <td>{v.version}</td>
+                    <td>v{v.version}</td>
                     <td>{new Date(v.date).toLocaleDateString()}</td>
                     <td>{v.uploadedBy}</td>
                     <td>{v.notes}</td>
