@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { mockEvidence } from "../data/mockData";
 import StatusChip from "../components/StatusChip";
 import Modal from "../components/Modal";
+import Swal from "sweetalert2";
 
 const EvidenceDetail = () => {
   const { id } = useParams();
@@ -23,10 +24,14 @@ const EvidenceDetail = () => {
     setNewVersionExpiry("");
   };
 
-  const handleUploadNewVersion = (e) => {
+  const handleUploadNewVersion = async (e) => {
     e.preventDefault();
     if (!newVersionNotes) {
-      alert("Notes are required.");
+      await Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Notes are required for a new version.",
+      });
       return;
     }
 
@@ -44,6 +49,12 @@ const EvidenceDetail = () => {
       lastUpdated: new Date().toISOString().split("T")[0],
       expiry: newVersionExpiry || prev.expiry,
     }));
+
+    await Swal.fire({
+      icon: "success",
+      title: "Upload Successful!",
+      text: `New version ${newVersion.version} uploaded for ${evidence.name}.`,
+    });
 
     handleCloseModal();
   };
@@ -99,7 +110,7 @@ const EvidenceDetail = () => {
                 .reverse()
                 .map((v) => (
                   <tr key={v.version}>
-                    <td>v{v.version}</td>
+                    <td>{v.version}</td>
                     <td>{new Date(v.date).toLocaleDateString()}</td>
                     <td>{v.uploadedBy}</td>
                     <td>{v.notes}</td>

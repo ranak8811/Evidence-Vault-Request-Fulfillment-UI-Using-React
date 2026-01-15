@@ -3,6 +3,7 @@ import { mockRequests, mockEvidence } from "../data/mockData";
 import DataTable from "../components/DataTable";
 import StatusChip from "../components/StatusChip";
 import Modal from "../components/Modal";
+import Swal from "sweetalert2";
 
 const BuyerRequests = () => {
   const [requests, setRequests] = useState(() =>
@@ -17,6 +18,7 @@ const BuyerRequests = () => {
   const handleOpenFulfillModal = (request) => {
     setCurrentRequestToFulfill(request);
     setIsModalOpen(true);
+
     setFulfillmentOption("selectExisting");
     setSelectedEvidenceId("");
     setNewEvidenceName("");
@@ -27,15 +29,23 @@ const BuyerRequests = () => {
     setCurrentRequestToFulfill(null);
   };
 
-  const handleFulfillRequest = (e) => {
+  const handleFulfillRequest = async (e) => {
     e.preventDefault();
 
     if (fulfillmentOption === "selectExisting" && !selectedEvidenceId) {
-      alert("Please select existing evidence.");
+      await Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Please select existing evidence.",
+      });
       return;
     }
     if (fulfillmentOption === "createNew" && !newEvidenceName.trim()) {
-      alert("Please enter a name for the new evidence.");
+      await Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Please enter a name for the new evidence.",
+      });
       return;
     }
 
@@ -47,15 +57,21 @@ const BuyerRequests = () => {
       )
     );
 
+    let successMessage = "";
     if (fulfillmentOption === "createNew") {
-      console.log(
-        `Creating new evidence: ${newEvidenceName} for request ${currentRequestToFulfill.name}`
-      );
+      successMessage = `New evidence "${newEvidenceName}" created and request "${currentRequestToFulfill.name}" fulfilled!`;
     } else {
-      console.log(
-        `Fulfilling request ${currentRequestToFulfill.name} with existing evidence ID: ${selectedEvidenceId}`
+      const fulfilledEvidence = mockEvidence.find(
+        (e) => e.id === selectedEvidenceId
       );
+      successMessage = `Request "${currentRequestToFulfill.name}" fulfilled with evidence "${fulfilledEvidence?.name}"!`;
     }
+
+    await Swal.fire({
+      icon: "success",
+      title: "Success!",
+      text: successMessage,
+    });
 
     handleCloseFulfillModal();
   };
